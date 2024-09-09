@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <title>Customer Segmentation</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        async function getCluster() {
+            const data = {
+                data: [
+                    parseFloat(document.getElementById('Education').value),
+                    parseFloat(document.getElementById('Income').value),
+                    parseFloat(document.getElementById('Kidhome').value),
+                    parseFloat(document.getElementById('Teenhome').value),
+                    parseFloat(document.getElementById('Recency').value),
+                    parseFloat(document.getElementById('Wines').value),
+                    parseFloat(document.getElementById('Fruits').value),
+                    parseFloat(document.getElementById('Meat').value),
+                    parseFloat(document.getElementById('Fish').value),
+                    parseFloat(document.getElementById('Sweets').value),
+                    parseFloat(document.getElementById('Gold').value),
+                    parseFloat(document.getElementById('Number of Deals Purchased').value),
+                    parseFloat(document.getElementById('Number of Web Purchases').value),
+                    parseFloat(document.getElementById('Number of Catalog Purchases').value),
+                    parseFloat(document.getElementById('Number from Store Purchased').value),
+                    parseFloat(document.getElementById('Number of Visits per month').value),
+                    parseFloat(document.getElementById('Spent').value),
+                    parseFloat(document.getElementById('Living Status').value),
+                    parseFloat(document.getElementById('Children').value),
+                ]
+            };
+            
+            try{
+                const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            if(!response.ok){
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            document.getElementById('result').innerText = 'Cluster: ' + result.cluster;
+            plotGraph(result.clusterData, result.cluster);
+        }catch(error){
+            console.error('There was a problem with the fetch operation:', error);
+            document.getElementById('result').innerText="Error fetching cluster data";
+        }
+    }
+        function plotGraph(clusterData, cluster) {
+            const trace = {
+                x: clusterData.x,
+                y: clusterData.y,
+                z: clusterData.z,
+                mode: 'markers',
+                marker: {
+                    size: 12,
+                    color: clusterData.cluster,
+                    colorscale:'Viridis'
+                },
+                type: 'scatter3d'
+            };
+
+            const layout = {
+                title: 'Customer Clusters',
+                scene: {
+                    xaxis: { title: 'PCA1' },
+                    yaxis: { title: 'PCA2' },
+                    zaxis: { title: 'PCA3' }
+                }
+            };
+
+            Plotly.newPlot('graph', [trace], layout);
+        }
+    </script>
+</head>
+<body>
+    <h1>Customer Segmentation</h1>
+    <div class="form-group">
+        <label for="Education">Education :</label>
+        <input type="text" id="Education">
+    </div>
+    <div class="form-group">
+        <label for="Income">Income :</label>
+        <input type="text" id="Income">
+    </div>
+    <div class="form-group">
+        <label for="Kidhome">Kidhome :</label>
+        <input type="text" id="Kidhome">
+    </div>
+    <div class="form-group">
+        <label for="Teenhome">Teenhome :</label>
+        <input type="text" id="Teenhome">
+    </div>
+    <div class="form-group">
+        <label for="Recency">Recency :</label>
+        <input type="text" id="Recency">
+    </div>
+    <div class="form-group">
+        <label for="Wines">Wines :</label>
+        <input type="text" id="Wines">
+    </div>
+    <div class="form-group">
+        <label for="Fruits">Fruits :</label>
+        <input type="text" id="Fruits">
+    </div>
+    <div class="form-group">
+        <label for="Meat">Meat :</label>
+        <input type="text" id="Meat">
+    </div>
+    <div class="form-group">
+        <label for="Fish">Fish :</label>
+        <input type="text" id="Fish">
+    </div>
+    <div class="form-group">
+        <label for="Sweets">Sweets :</label>
+        <input type="text" id="Sweets">
+    </div>
+    <div class="form-group">
+        <label for="Gold">Gold :</label>
+        <input type="text" id="Gold">
+    </div>
+    <div class="form-group">
+        <label for="Number of Deals Purchased">Number of Deals Purchased :</label>
+        <input type="text" id="Number of Deals Purchased">
+    </div>
+    <div class="form-group">
+        <label for="Number of Web Purchases">Number of Web Purchases :</label>
+        <input type="text" id="Number of Web Purchases">
+    </div>
+    <div class="form-group">
+        <label for="Number of Catalog Purchases">Number of Catalog Purchases :</label>
+        <input type="text" id="Number of Catalog Purchases">
+    </div>
+    <div class="form-group">
+        <label for="Number from Store Purchased">Number from Store Purchases :</label>
+        <input type="text" id="Number from Store Purchased">
+    </div>
+    <div class="form-group">
+        <label for="Number of Visits per month">Number of Visits per month :</label>
+        <input type="text" id="Number of Visits per month">
+    </div>
+    <div class="form-group">
+        <label for="Spent">Spent :</label>
+        <input type="text" id="Spent">
+    </div>
+    <div class="form-group">
+        <label for="Living Status">Living Status :</label>
+        <input type="text" id="Living Status">
+    </div>
+    <div class="form-group">
+        <label for="Children">Children :</label>
+        <input type="text" id="Children">
+    </div>
+    <button onclick="getCluster()">Get Cluster</button>
+    <p id="result"></p>
+    <div id="graph"></div>
+</body>
+</html>
